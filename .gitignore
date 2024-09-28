@@ -1,0 +1,10 @@
+__pycache__
+.env
+env
+venv
+virtualenv
+media/*
+db.sqlite3
+pgdata
+mynotes.txt
+nohup*
