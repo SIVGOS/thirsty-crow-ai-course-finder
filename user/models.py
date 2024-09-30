@@ -1,12 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from explore.models import Subject, Topic
 
-class Topic(models.Model):
+class UserSubject(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    topic = models.CharField(max_length=256)
-    experience_level = models.CharField(max_length=64)
-    dedication = models.CharField(max_length=64)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self) -> str:
-        return f'{self.user.email}: {self.topic}'
+class UserTopic(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    confidence_level = models.IntegerField()
+    created_on = models.DateTimeField(auto_now_add=True)
 

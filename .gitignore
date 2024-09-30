@@ -8,3 +8,4 @@ db.sqlite3
 pgdata
 mynotes.txt
 nohup*
+recreate_migrations.sh

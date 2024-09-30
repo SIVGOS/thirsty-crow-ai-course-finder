@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Score Topics</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for topic in topics %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ topic.topic_name }}</h5>
+                    <p class="card-text">{{ topic.description }}</p>
+                    <div class="form-group">
+                        <label for="score_{{ forloop.counter }}">Give yourself a score between 0 and 10</label>
+                        <input type="number" class="form-control" id="score_{{ forloop.counter }}" name="score_{{ topic.id }}" min="0" max="10" required>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.subject_name.label_tag }}
+            {{ form.subject_name }}
+        </div>
+        <div class="form-group">
+            {{ form.experience_code.label_tag }}
+            {{ form.experience_code }}
+        </div>
+        <div class="form-group">
+            {{ form.dedication_code.label_tag }}
+            {{ form.dedication_code }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

@@ -24,6 +24,6 @@ urlpatterns = [
     path('login/', user_views.login_view, name='login'),
     path('logout/', user_views.logout_view, name='logout'),
     path('password/reset/', user_views.password_reset, name='reset_password'),
-    path('topic/', user_views.topic_view, name='topic'),
+    path('subject/', exp_views.create_subject, name='subject'),
     path('dashboard/', exp_views.dashboard_view, name='dashboard')
 ]
