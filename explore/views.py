@@ -4,11 +4,12 @@ from django.urls import reverse
 from .forms import SubjectForm
 from user.models import UserSubject, UserTopic
 from .models import Subject, Topic
+from constants import GET, POST
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/login/') 
 def create_subject(request):
-    if request.method == 'POST':
+    if request.method == POST:
         form = SubjectForm(request.POST)
         if form.is_valid():
             subject_name = form.cleaned_data['subject_name']
@@ -29,12 +30,11 @@ def create_subject(request):
             if not topics:
                 print('Generating topics...')
                 topics = get_sub_topics(subject)
-            return render(request, 'topics.html', {'topics': topics})
+            request.method = GET
+            return redirect('', {'topics': topics})
     else:
         form = SubjectForm()
     
     return render(request, 'create_subject.html', {'form': form})
 
 
-def dashboard_view(request):
-    return HttpResponse('In progress')

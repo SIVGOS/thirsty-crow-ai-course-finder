@@ -42,8 +42,10 @@ class Topic(models.Model):
 
 class YoutubeVideo(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='videos')
-    video_url = models.URLField()
+    video_key = models.CharField(max_length=32)
     video_title = models.CharField(max_length=256)
-    channel_name = models.CharField(max_length=256)
+    likes_count = models.IntegerField(null=True)
+    views_count = models.IntegerField(null=True)
+    uploaded_on = models.DateField(null=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
