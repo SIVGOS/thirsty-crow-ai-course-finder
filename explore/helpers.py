@@ -5,7 +5,7 @@ import google.generativeai as genai
 from googleapiclient.discovery import build
 from .models import Subject, Topic, YoutubeVideo
 from user.models import UserTopic
-from .template_utils import GET_SUB_TOPICS, VIDEO_SEARCH_TEMPLATE
+from .template_utils import GET_SUB_TOPICS, VIDEO_SEARCH_TEMPLATE, get_confidence_keyword
 from constants import (GEMINI_API_KEY, GEMINI_MODEL_NAME,
                        YOUTUBE_API_KEY, YOUTUBE_API_SERVICE_NAME,  YOUTUBE_API_VERSION)
 

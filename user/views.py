@@ -1,6 +1,9 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import F
 from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import UserSubject
 from constants import GET, POST
 
@@ -21,7 +24,6 @@ def login_view(request):
             login(request, user)
             request.method = GET
             if not UserSubject.objects.filter(user=user).exists():
-                print('###########')
                 return redirect('/subject/')
             return redirect('/dashboard/')
 
@@ -32,5 +34,18 @@ def password_reset(request):
 
 @login_required(login_url='/login/')
 def dashboard(request):
-    user_subjects = UserSubject.objects.filter(user=request.user).order_by('-created_on')
-    return render(request, 'dashboard.html', user_subjects)
+    user_subjects = (
+        UserSubject.objects.filter(user=request.user)
+        .order_by('-created_on')
+        .annotate(subject_name=F('subject__subject_name'))
+        .values('subject_name', 'status', 'tracking_id')
+    )
+
+    tracking_ids = '|'.join([str(z['tracking_id']) for z in user_subjects if z['status'] == 'PROCESSING'])
+    return render(request, 'dashboard.html', {'subjects': user_subjects, 'tracking_ids': tracking_ids})
+
+@api_view(http_method_names=[GET])
+def get_status(request):
+    tracking_id = request.GET.get('tracking_id')
+    data = UserSubject.objects.filter(tracking_id=tracking_id).values('status').first()
+    return Response(data)

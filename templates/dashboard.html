@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <th>Subject Name</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for subject in subjects %}
+        <tr id="subject-{{ subject.id }}">
+            <td>{{ subject.subject_name }}</td>
+            <td>
+                {% if subject.status == 'PROCESSING' %}
+                    <span class="icon-in-progress">🔄</span>
+                {% elif subject.status == 'PROCESSED' %}
+                    <a href="/subject/view?id={{ subject.id }}" class="btn-view">View</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/statusChecker.js' %}"></script>
+<script>
+    window.onload = function() {
+        pollStatuses("{{ tracking_ids }}");
+    };
+</script>
+{% endblock %}

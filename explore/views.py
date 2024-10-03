@@ -31,10 +31,8 @@ def create_subject(request):
                 print('Generating topics...')
                 topics = get_sub_topics(subject)
             request.method = GET
-            return redirect('', {'topics': topics})
+            return render('topics.html', {'topics': topics})
     else:
         form = SubjectForm()
     
     return render(request, 'create_subject.html', {'form': form})
-
-

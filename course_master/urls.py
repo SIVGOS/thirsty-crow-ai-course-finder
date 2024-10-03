@@ -16,13 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 import user.views as user_views
 import explore.views as exp_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('login/', user_views.login_view, name='login'),
+    path('dashboard/', user_views.dashboard, name='dashboard'),
     path('logout/', user_views.logout_view, name='logout'),
     path('password/reset/', user_views.password_reset, name='reset_password'),
-    path('subject/', exp_views.create_subject, name='subject')
-]
+    path('subject/', exp_views.create_subject, name='subject'),
+    path('topic/', exp_views.get_sub_topics),
+    path('subject/track/', user_views.get_status)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
