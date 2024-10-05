@@ -24,6 +24,7 @@ import explore.views as exp_views
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
+    path('', user_views.home, name='home'),
     path('login/', user_views.login_view, name='login'),
     path('dashboard/', user_views.dashboard, name='dashboard'),
     path('logout/', user_views.logout_view, name='logout'),

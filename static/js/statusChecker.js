@@ -15,7 +15,7 @@ function checkStatus(trackingId) {
 }
 
 function pollStatuses(trackingIds) {
-    let trackingIds = trackingIds.split('|')
+    trackingIds = trackingIds.split('|')
     trackingIds.forEach((trackingId) => {
         if(isValidUUID(trackingId)){
             setInterval(() => {

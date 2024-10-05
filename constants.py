@@ -14,3 +14,8 @@ if not GEMINI_API_KEY:
 
 if not YOUTUBE_API_KEY:
     raise Exception('YOUTUBE_API_KEY must be present in enviroment')
+
+LOGIN_MSG = {
+    '0': 'Logged out successfully',
+    '1': 'Password changed. Please log in with your new password'
+}

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<table>
-    <thead>
+<table class="table table-striped table-bordered">
+    <thead class="thead-dark">
         <tr>
-            <th>Subject Name</th>
-            <th>Status</th>
+            <th scope="col">Subject Name</th>
+            <th scope="col">Status</th>
         </tr>
     </thead>
     <tbody>
@@ -14,9 +14,9 @@
             <td>{{ subject.subject_name }}</td>
             <td>
                 {% if subject.status == 'PROCESSING' %}
-                    <span class="icon-in-progress">🔄</span>
+                    <span class="badge badge-warning">Processing 🔄</span>
                 {% elif subject.status == 'PROCESSED' %}
-                    <a href="/subject/view?id={{ subject.id }}" class="btn-view">View</a>
+                    <a href="/subject/view?id={{ subject.id }}" class="btn btn-primary btn-sm">View</a>
                 {% endif %}
             </td>
         </tr>
