@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Load .env file
+if [ -f .env ]; then
+    export $(cat .env | xargs)
+fi
+
+
 # Function to check and kill a process by name
 kill_process() {
     local process_name=$1
@@ -17,12 +23,13 @@ kill_process() {
     fi
 }
 
-# Function to check if a service is running on a given port
+# Function to check if a service is running on a given host and port
 check_service() {
     local service_name=$1
-    local port=$2
-    if ! nc -z localhost $port; then
-        echo "Error: $service_name is not running on port $port. Please start it and try again."
+    local host=$2
+    local port=$3
+    if ! nc -z $host $port; then
+        echo "Error: $service_name is not running on $host:$port. Please start it and try again."
         exit 1
     fi
 }
@@ -52,8 +59,8 @@ if [ "$terminate_only" = true ]; then
 fi
 
 # Check if PostgreSQL and Redis are running
-check_service "PostgreSQL" 5432
-check_service "Redis" 6379
+check_service "PostgreSQL" $DB_HOST $DB_PORT
+check_service "Redis" $REDIS_HOST $REDIS_PORT
 
 # Start the Celery worker process
 nohup env/bin/python -m celery -A course_master worker > nohup_celery.out 2>&1 &
