@@ -19,3 +19,7 @@ LOGIN_MSG = {
     '0': 'Logged out successfully',
     '1': 'Password changed. Please log in with your new password'
 }
+
+class ProcessingStatus:
+    PROCESSED = 'PROCESSED'
+    PROCESSING = 'PROCESSING'

@@ -2,11 +2,12 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from explore.models import Subject, Topic
+from constants import ProcessingStatus
 
 class UserSubject(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    status = models.CharField(max_length=32, default='PROCESSING')
+    status = models.CharField(max_length=32, default=ProcessingStatus.PROCESSING)
     tracking_id = models.UUIDField(unique=True)
     created_on = models.DateTimeField(auto_now_add=True)
 

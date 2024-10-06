@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import UserSubject
-from constants import GET, POST, LOGIN_MSG
+from constants import GET, POST, LOGIN_MSG, ProcessingStatus
 
 def logout_view(request):
     if not request.user.is_anonymous:
@@ -67,7 +67,7 @@ def dashboard(request):
     if not user_subjects:
         return redirect('/subject/')
     
-    tracking_ids = '|'.join([str(z['tracking_id']) for z in user_subjects if z['status'] == 'PROCESSING'])
+    tracking_ids = '|'.join([str(z['tracking_id']) for z in user_subjects if z['status'] == ProcessingStatus.PROCESSING])
     return render(request, 'dashboard.html', {'subjects': user_subjects, 'tracking_ids': tracking_ids})
 
 @api_view(http_method_names=[GET])

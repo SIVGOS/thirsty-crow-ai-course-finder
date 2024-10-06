@@ -127,6 +127,9 @@ def get_videos_for_topic(topic: UserTopic):
         yt_video.uploaded_on = video['upload_date']
         yt_video.save()
         video_ids.append(yt_video.id)
+        
+        if len(video_ids)>4:
+            break
     
     return video_ids
 

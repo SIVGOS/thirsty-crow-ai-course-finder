@@ -4,6 +4,7 @@ from django.urls import reverse
 from .forms import SubjectForm
 from user.models import UserSubject, UserTopic
 from .models import Subject, Topic
+from .tasks import populate_videos
 from constants import GET, POST
 from django.contrib.auth.decorators import login_required
 
@@ -30,6 +31,8 @@ def create_subject(request):
             if not topics:
                 print('Generating topics...')
                 topics = get_sub_topics(subject)
+
+            populate_videos.delay(user_subject.id)
             request.method = GET
             return render('topics.html', {'topics': topics})
     else:
