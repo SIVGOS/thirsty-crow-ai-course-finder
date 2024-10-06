@@ -49,3 +49,7 @@ class YoutubeVideo(models.Model):
     uploaded_on = models.DateField(null=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
+
+class YoutubeVideoSummary(models.Model):
+    video_id = models.CharField(max_length=32, unique=True)
+    summary = models.TextField()

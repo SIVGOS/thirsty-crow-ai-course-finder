@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 import datetime as dt
 import google.generativeai as genai
 from googleapiclient.discovery import build
-from .models import Subject, Topic, YoutubeVideo
-from user.models import UserTopic
-from .template_utils import GET_SUB_TOPICS, VIDEO_SEARCH_TEMPLATE, get_confidence_keyword
+import youtube_transcript_api
+from .models import Subject, Topic, YoutubeVideo, YoutubeVideoSummary
+from user.models import UserTopic, UserSubject
+from .template_utils import GET_SUB_TOPICS, VIDEO_SEARCH_TEMPLATE, get_confidence_keyword, VIDEO_SUMMARIZE_PROMPT_TEMPLATE
 from constants import (GEMINI_API_KEY, GEMINI_MODEL_NAME,
                        YOUTUBE_API_KEY, YOUTUBE_API_SERVICE_NAME,  YOUTUBE_API_VERSION)
 
@@ -72,15 +73,49 @@ def search_youtube_videos(query:str, max_results:int=5, order:str='relevance'):
 
     return videos
 
-def get_video_for_topic(topic: UserTopic):
+def check_or_create_video_summary(video_id, video_title):
+    if YoutubeVideoSummary.objects.filter(video_id=video_id).exists():
+        return True
+    try:
+        transcript = youtube_transcript_api.YouTubeTranscriptApi.get_transcript(video_id)
+        transcript_text = [z.get('text', '') for z in transcript]
+        transcript_text = '\n'.join([z.strip() for z in transcript_text if z.strip()])
+    except Exception as e:
+        print('Failed transcript generation:', str(e))
+        return False
+    
+    try:
+        model = genai.GenerativeModel(GEMINI_MODEL_NAME)
+        prompt = VIDEO_SUMMARIZE_PROMPT_TEMPLATE.format(
+            video_title=video_title,
+            transcript_text=transcript_text
+        )
+        resp = model.generate_content(prompt)
+        video_summary = resp.text
+        YoutubeVideoSummary.objects.create(video_id=video_id, summary=video_summary)
+        return True
+    except Exception as e:
+        print('Video transcript exists but LLM agent failed to generate summary')
+        print('Exception:', str(e))
+        return False
+    
+
+def get_videos_for_topic(topic: UserTopic):
     keyword = VIDEO_SEARCH_TEMPLATE.format(
         topic_name=topic.topic.topic_name,
         subject_name=topic.topic.subject.subject_name,
         experience=get_confidence_keyword(topic.confidence_level)
     )
-    videos = search_youtube_videos(keyword)
+    videos = search_youtube_videos(keyword, max_results=10)
     video_ids = []
     for video in videos:
+        video_id = video['video_id']
+        video_title = video['title']
+
+        if not check_or_create_video_summary(video_id, video_title):
+            print(f'Skipping video "{video_title}" as it does not have a summary')
+            continue
+
         yt_video, created = YoutubeVideo.objects.get_or_create(
             topic=topic.topic,
             video_key=video['video_id'],
@@ -95,6 +130,3 @@ def get_video_for_topic(topic: UserTopic):
     
     return video_ids
 
-
-
-        

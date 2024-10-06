@@ -17,3 +17,8 @@ def get_confidence_keyword(confidence_level:int):
         return 'advanced'
     return 'beginer'
 
+VIDEO_SUMMARIZE_PROMPT_TEMPLATE = """Generate a brief summary of the youtube video titled "{video_title}" from tha transcript provided below.
+Please summarize it in bullet points so that I can quickly skim through the key topics covered in the video.
+Video Transcript:
+{transcript_text}
+"""
