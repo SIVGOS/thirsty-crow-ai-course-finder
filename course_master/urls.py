@@ -30,7 +30,11 @@ urlpatterns = [
     path('logout/', user_views.logout_view, name='logout'),
     path('password/reset/', user_views.password_reset, name='reset_password'),
     path('subject/', exp_views.create_subject, name='subject'),
-    path('topic/', exp_views.get_sub_topics),
-    path('subject/track/', user_views.get_status)
+    path('topics/', exp_views.topic_confidence_view, name='topic'),
+    path('loader/', exp_views.loader_view),
+    path('topic/track', exp_views.track_topic_creation),
+    path('subject/track/', user_views.get_status),
+    path('usersubject/delete/', user_views.delete_usersubject, name='delete-usersubject'),
+    path('subject/view/', user_views.vew_videos, name='view_videos')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

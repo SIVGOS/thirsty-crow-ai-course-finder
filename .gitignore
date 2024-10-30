@@ -9,3 +9,4 @@ pgdata
 mynotes.txt
 nohup*
 recreate_migrations.sh
+.DS_Store

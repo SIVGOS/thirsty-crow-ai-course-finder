@@ -4,8 +4,10 @@ from django.db.models import F
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import UserSubject
-from constants import GET, POST, LOGIN_MSG, ProcessingStatus
+from rest_framework import status
+from .models import UserSubject, UserTopic
+from explore.models import YoutubeVideo, YoutubeVideoSummary
+from config import GET, POST, DELETE, LOGIN_MSG, YOUTUBE_URL_FORMAT, ProcessingStatus
 
 def logout_view(request):
     if not request.user.is_anonymous:
@@ -61,7 +63,7 @@ def dashboard(request):
         UserSubject.objects.filter(user=request.user)
         .order_by('-created_on')
         .annotate(subject_name=F('subject__subject_name'))
-        .values('subject_name', 'status', 'tracking_id')
+        .values('id', 'subject_name', 'status', 'tracking_id')
     )
 
     if not user_subjects:
@@ -72,6 +74,50 @@ def dashboard(request):
 
 @api_view(http_method_names=[GET])
 def get_status(request):
-    tracking_id = request.GET.get('tracking_id')
-    data = UserSubject.objects.filter(tracking_id=tracking_id).values('status').first()
-    return Response(data)
+    tracking_ids = request.query_params.get('tracking_ids').split('|')
+    tracking_statuses = UserSubject.objects.filter(tracking_id__in=tracking_ids).values_list('status', flat=True)
+    processing_status = ProcessingStatus.PROCESSING
+    if any(z==ProcessingStatus.PROCESSED for z in tracking_statuses):
+        processing_status = ProcessingStatus.PROCESSED
+    return Response({'status': processing_status}, status=status.HTTP_200_OK)
+        
+
+@login_required(login_url='/login/')
+def vew_videos(request):
+    user_subject = UserSubject.objects.get(id=request.GET.get('id'))
+    user_topics = UserTopic.objects.filter(user=request.user, topic__subject=user_subject.subject)
+    contexts = {
+        'subject': user_subject.subject.subject_name,
+        'tracking_key': user_subject.tracking_id,
+        'topics': []
+        }
+    for user_topic in user_topics:
+        data = {
+            'topic_name': user_topic.topic.topic_name,
+            'videos': []
+        }
+        for video in YoutubeVideo.objects.filter(topic=user_topic.topic):
+            video_summary = YoutubeVideoSummary.objects.get(video_id=video.video_key)
+            data['videos'].append({
+                'id': video.id,
+                'title': video.video_title,
+                'url': YOUTUBE_URL_FORMAT.format(video_id=video.video_key),
+                'uploaded_on': video.uploaded_on,
+                'likes': video.likes_count,
+                'views': video.views_count,
+                'video_summary': video_summary
+            })
+            contexts['topics'].append(data)
+    
+    print(contexts)
+    return render(request, 'view_subject.html', contexts)
+
+@api_view(http_method_names=[DELETE])
+def delete_usersubject(request):
+    try:
+        tracking_id = request.query_params.get('tracking_id')
+        UserSubject.objects.filter(user=request.user, tracking_id=tracking_id).delete()
+        return Response({'message': 'deleted'}, status=status.HTTP_200_OK)
+    except Exception as ex:
+        print(ex)
+        return Response({'error': f'{ex}'}, status=status.HTTP_400_BAD_REQUEST)

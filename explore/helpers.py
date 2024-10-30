@@ -7,7 +7,7 @@ import youtube_transcript_api
 from .models import Subject, Topic, YoutubeVideo, YoutubeVideoSummary
 from user.models import UserTopic, UserSubject
 from .template_utils import GET_SUB_TOPICS, VIDEO_SEARCH_TEMPLATE, get_confidence_keyword, VIDEO_SUMMARIZE_PROMPT_TEMPLATE
-from constants import (GEMINI_API_KEY, GEMINI_MODEL_NAME,
+from config import (GEMINI_API_KEY, GEMINI_MODEL_NAME,
                        YOUTUBE_API_KEY, YOUTUBE_API_SERVICE_NAME,  YOUTUBE_API_VERSION)
 
 genai.configure(api_key=GEMINI_API_KEY)
@@ -29,8 +29,6 @@ def get_sub_topics(subject: Subject):
                             description=topic['description']
                         )
         topic_objects.append(topic)
-    
-    return topic_objects
 
 
 def search_youtube_videos(query:str, max_results:int=5, order:str='relevance'):
@@ -118,9 +116,11 @@ def get_videos_for_topic(topic: UserTopic):
 
         yt_video, created = YoutubeVideo.objects.get_or_create(
             topic=topic.topic,
-            video_key=video['video_id'],
-            video_title=video['title']
+            video_key=video['video_id']
         )
+
+        if yt_video.video_title != video['title']:
+            yt_video.video_title=video['title']
 
         yt_video.likes_count = video['likes']
         yt_video.views_count = video['views']

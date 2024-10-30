@@ -62,15 +62,30 @@ fi
 check_service "PostgreSQL" $DB_HOST $DB_PORT
 check_service "Redis" $REDIS_HOST $REDIS_PORT
 
+# Delete older logs if exists
+if [ -f nohup_celery.out ]; then
+    rm nohup_celery.out
+fi
+
+PYTHON_PATH=python3
+
+if [ -f env/bin/python ]; then
+    PYTHON_PATH="env/bin/python"
+fi
+
 # Start the Celery worker process
-nohup env/bin/python -m celery -A course_master worker > nohup_celery.out 2>&1 &
+nohup $PYTHON_PATH -m celery -A course_master worker > nohup_celery.out 2>&1 &
 
 if [ "$developer_mode" == true ]; then
     echo "Celery workers ran successfully in background."
     # Start the Django runserver process on console
-    env/bin/python manage.py runserver
+    $PYTHON_PATH manage.py runserver
 else
     # Start the Django runserver process in background
-    nohup env/bin/python manage.py runserver > nohup_django.out 2>&1 &
+    # First delete older log if exists
+    if [ -f nohup_django.out ]; then
+        rm nohup_django.out
+    fi
+    nohup $PYTHON_PATH manage.py runserver > nohup_django.out 2>&1 &
     echo "Processes restarted successfully."
 fi

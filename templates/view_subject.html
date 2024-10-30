@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ subject }} Videos</h1>
+    {% for topic in topics %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2>{{ topic.topic_name }}</h2>
+            </div>
+            <div class="card-body">
+                {% for video in topic.videos %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ video.title }}</h5>
+                            <p class="card-text">Uploaded on: {{ video.uploaded_on }}</p>
+                            <p class="card-text">Likes: {{ video.likes }}</p>
+                            <p class="card-text">Views: {{ video.views }}</p>
+                            
+                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#summary-{{ forloop.counter }}" aria-expanded="false" aria-controls="summary-{{ forloop.counter }}">
+                                Toggle Summary/Video
+                            </button>
+                            <a href="{{ video.url }}" class="btn btn-success" target="_blank">Watch on YouTube</a>
+                            <button class="btn btn-secondary add-to-playlist" data-video-id="{{ video.id }}">Add to Playlist</button>
+                            
+                            <div class="collapse mt-3" id="summary-{{ forloop.counter }}">
+                                <div class="card card-body">
+                                    <h5>Video Summary</h5>
+                                    <p>{{ video.video_summary }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/customScripts.js' %}"></script>
+<script>
+     document.addEventListener('DOMContentLoaded', function(){
+        subjectViewHandler("{{ tracking_id }}");
+     })
+</script>
+{% endblock %}
+

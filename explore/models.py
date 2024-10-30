@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 class Subject(models.Model):
     class ExperienceChoices(models.IntegerChoices):
@@ -13,13 +14,16 @@ class Subject(models.Model):
     subject_name = models.CharField(max_length=256)
     experience_code = models.IntegerField(choices=ExperienceChoices.choices)
     dedication_code = models.IntegerField(choices=DedicationChoices.choices)
+    topics_created = models.BooleanField(default=False)
+    tracking_id = models.UUIDField(null=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.subject_name}'
     
     def save(self, *args, **kwargs):
-        self.subject_name = ' '.join(self.subject_name.strip().upper().split())
+        if self.tracking_id is None:
+            self.tracking_id = uuid.uuid4()
         super().save(*args, **kwargs)
 
     def get_experience_display(self):

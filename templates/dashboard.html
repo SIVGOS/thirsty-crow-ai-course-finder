@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<table class="table table-striped table-bordered">
+<table class="table table-striped">
     <thead class="thead-dark">
         <tr>
             <th scope="col">Subject Name</th>
             <th scope="col">Status</th>
+            <th scope="action">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,11 @@
                     <a href="/subject/view?id={{ subject.id }}" class="btn btn-primary btn-sm">View</a>
                 {% endif %}
             </td>
+            <td>
+                <button class="btn-danger btn=sm" onclick="deleteTest('{{ subject.tracking_id }}')">
+                    <span>Delete</span>
+                </button>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -27,10 +33,10 @@
 
 {% block scripts %}
 {% load static %}
-<script src="{% static 'js/statusChecker.js' %}"></script>
+<script src="{% static 'js/customScripts.js' %}"></script>
 <script>
-    window.onload = function() {
-        pollStatuses("{{ tracking_ids }}");
-    };
+    document.addEventListener('DOMContentLoaded', ()=>{
+        checkVideoFindStatus("{{ tracking_ids }}")
+    });
 </script>
 {% endblock %}

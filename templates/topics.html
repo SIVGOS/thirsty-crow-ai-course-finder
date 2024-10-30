@@ -6,6 +6,7 @@
     <form method="post">
         {% csrf_token %}
         {% for topic in topics %}
+            <input type="hidden", id="subject_id", name="subject_id", value="{{ subject_id }}">
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ topic.topic_name }}</h5>

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="alert alert-info" role="alert">
+            {{ message }}
+        </div>
+        <img src="{% static 'images/Spinner-2.gif' %}" alt="Loading..." class="img-fluid mt-3">
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/customScripts.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+        checkTopicCreation("{{ tracking_id }}")
+    });
+</script>
+{% endblock %}

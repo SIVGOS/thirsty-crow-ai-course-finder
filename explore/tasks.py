@@ -1,8 +1,15 @@
 from celery import shared_task
 from user.models import UserSubject, UserTopic
-from .models import Topic
-from .helpers import get_videos_for_topic
-from constants import ProcessingStatus
+from .models import Subject
+from .helpers import get_sub_topics, get_videos_for_topic
+from config import ProcessingStatus    
+
+@shared_task
+def populate_topics(subject_id):
+    subject = Subject.objects.get(id=subject_id)
+    get_sub_topics(subject)
+    subject.topics_created = True
+    subject.save()
 
 @shared_task
 def populate_videos(user_subject_id):
@@ -12,3 +19,8 @@ def populate_videos(user_subject_id):
         get_videos_for_topic(user_topic)
     user_subject.status = ProcessingStatus.PROCESSED
     user_subject.save()
+
+@shared_task
+def create_file(filename):
+    with open(filename, 'w') as fp:
+        fp.write('test test')
