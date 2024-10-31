@@ -35,9 +35,8 @@ def create_subject(request):
 
     if subject.topics_created:
         return redirect(f'/topics?subject_id={subject.id}')
-
     populate_topics.delay(subject.id)
-    return redirect(f'/loader/?ref=0&trackng_id={subject.tracking_id}&obj_id={subject.id}')
+    return redirect(f'/loader/?tracking_id={subject.tracking_id}')
 
 @api_view(http_method_names=[GET])
 def track_topic_creation(request):
@@ -53,8 +52,8 @@ def track_topic_creation(request):
 
 @login_required(login_url='/login/') 
 def loader_view(request):
-    trackng_id = request.GET.get('trackng_id')
-    return render(request, 'loader.html', {'trackng_id': trackng_id})
+    tracking_id = request.GET.get('tracking_id')
+    return render(request, 'loader.html', {'tracking_id': tracking_id})
 
 @login_required(login_url='/login/') 
 def topic_confidence_view(request):
@@ -65,7 +64,7 @@ def topic_confidence_view(request):
     
     subject_id = int(request.POST.get('subject_id'))
     for key, value in request.POST.items():
-        if key.startswith('topic_'):
+        if key.startswith('score_'):
             topic_id = int(key.split('_')[1])
             UserTopic.objects.create(
                 user=request.user,

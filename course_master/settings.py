@@ -139,8 +139,6 @@ REDIS_URL='redis://{redis_host}:{redis_port}/0'.format(
             redis_port=os.getenv('REDIS_PORT')
 )
 
-print(REDIS_URL)
-
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']

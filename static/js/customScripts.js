@@ -14,10 +14,15 @@ function getCookie(name) {
 }
 
 function checkVideoFindStatus(trackingIds) {
-    if(trackingIds.length>30){
+    if(trackingIds && trackingIds != '') {
         setInterval(()=>{
             fetch(`/subject/track?tracking_ids=${trackingIds}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if(data.status === 'PROCESSED'){
                     location.reload();
@@ -28,48 +33,50 @@ function checkVideoFindStatus(trackingIds) {
     }
 }
 
-function deleteTest(subjectId) {
-    const apiUrl = `/usersubject/delete/?tracking_id=${subjectId}`;
-    const CSRFToken = getCookie('csrftoken');
-    fetch(apiUrl, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': CSRFToken
-            }
-        }).then((response)=>{
+function deleteSubject(subjectId) {
+    if(confirm('Are you sure that you want to delete this subject?')){
+        const apiUrl = `/usersubject/delete/?tracking_id=${subjectId}`;
+        const CSRFToken = getCookie('csrftoken');
+        fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRFToken
+                }
+        })
+        .then((response)=>{
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             location.reload();
-        }
-        ).catch(error => console.error('Error:', error));
+        })
+        .catch(error => console.error('Error:', error));
+    }
 }
 
 
 function checkTopicCreation(trackingId) {
-    const callbackUrl = `/topic/track/?tracking_id=${trackingId}`;
     setInterval( () => {
-    fetch(callbackUrl)
-    .then(response => {
-            if (response.status === 200) {
-                return response.json();
+        fetch(`/topic/track/?tracking_id=${trackingId}`)
+        .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else if (response.status === 204){
+                    console.log('Topics not yet created.');
+                    return null;
+                } else {
+                    throw new Error(`HTTP Error! Status: ${response.status}`);
+                }
+        })
+        .then(data => {
+            if (data) {
+                window.location = `/topics/?subject_id=${data.subject_id}`;
             }
-            else if(response.status === 204){
-                console.log('Topics not yet created.')
-            }
-            else {
-                throw new Error(`HTTP Error! Status: ${response.status}`);
-            }
-    })
-    .then(data => {
-        const subjectId = data.subject_id;
-        window.location = `/topics/?subject_id=${subjectId}`;
-    }
-    )
-    .catch(error => {
-            console.error('Error:', error);
-        });
+        }
+        )
+        .catch(error => {
+                console.error('Error:', error);
+            });
     }, 1000);
 }
 

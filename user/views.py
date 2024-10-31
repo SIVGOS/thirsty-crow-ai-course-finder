@@ -109,7 +109,6 @@ def vew_videos(request):
             })
             contexts['topics'].append(data)
     
-    print(contexts)
     return render(request, 'view_subject.html', contexts)
 
 @api_view(http_method_names=[DELETE])
@@ -119,5 +118,4 @@ def delete_usersubject(request):
         UserSubject.objects.filter(user=request.user, tracking_id=tracking_id).delete()
         return Response({'message': 'deleted'}, status=status.HTTP_200_OK)
     except Exception as ex:
-        print(ex)
         return Response({'error': f'{ex}'}, status=status.HTTP_400_BAD_REQUEST)
